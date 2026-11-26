@@ -3,6 +3,9 @@
 import { ref } from 'vue'
 import { obtenerToken } from '../services/api.js'
 
+// Evento para avisar a App.vue que se inició sesión
+const emit = defineEmits(['sesion-iniciada'])
+
 // Variables del formulario
 const correo = ref('')
 const licencia = ref('')
@@ -35,27 +38,17 @@ async function iniciarSesion() {
         // Mostramos un mensaje de éxito
         mensaje.value = 'Sesión iniciada. Token guardado.'
 
+        // Avisamos a App.vue para mostrar el perfil
+        emit('sesion-iniciada', respuesta.token)
+
     } catch (error) {
-        // Mostramos el error si la petición falla
+        // Mostramos el error si falla la petición
         mensaje.value = 'Error: ' + error.message
 
     } finally {
-        // Volvemos a habilitar el botón
+        // Habilitamos nuevamente el botón
         cargando.value = false
     }
-}
-
-// Función para cerrar sesión
-function cerrarSesion() {
-    // Eliminamos el token del navegador
-    localStorage.removeItem('token')
-
-    // Limpiamos los campos
-    correo.value = ''
-    licencia.value = ''
-
-    // Mostramos un mensaje
-    mensaje.value = 'Sesión cerrada.'
 }
 </script>
 
@@ -89,10 +82,6 @@ function cerrarSesion() {
         </button>
 
     </form>
-
-    <button type="button" @click="cerrarSesion">
-        Cerrar sesión
-    </button>
 
     <p role="status">{{ mensaje }}</p>
 </template>
